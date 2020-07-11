@@ -24,6 +24,10 @@ import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import AllInboxIcon from '@material-ui/icons/AllInbox';
+import '../styles/drawer.css';
+import Axios from 'axios';
+import FoodList from './foodlist';
+
 
 const drawerWidth = 240;
 
@@ -96,6 +100,10 @@ export default function MiniDrawer(props) {
     const [open, setOpen] = React.useState(false);
     const [opentype, setOpentype] = React.useState(false);
     const [openfoods, setOpenfoods] = React.useState(false);
+    const [opencat, setOpencat] = React.useState(false);
+    const [openfood, setOpenfood] = React.useState(false);
+    const [catlist, setCatlist] = React.useState([]);
+    const [foodlist, setFoodlist] = React.useState([]);
     const handleDrawerOpen = () => {
         setOpen(true);
     };
@@ -108,6 +116,37 @@ export default function MiniDrawer(props) {
     }
     const Openfood = () => {
         setOpenfoods(!openfoods);
+    }
+    const viewfoodsadmin = () => {
+        if (sessionStorage.getItem('userData') !== null) {
+            Axios.get(`http://localhost:5000/viewfooduser`)
+                .then(res => {
+                    if (res.data.success === true) {
+                        setFoodlist(res.data.data);
+                        setOpenfood(!openfood)
+                    }
+                })
+
+        }
+        else if (sessionStorage.getItem('adminData') !== null) {
+            Axios.get(`http://localhost:5000/viewfoodadmin`)
+                .then(res => {
+                    if (res.data.success === true) {
+                        setFoodlist(res.data.data);
+                        setOpenfood(!openfood)
+                    }
+                })
+        }
+    }
+
+    const viewtype = () => {
+        Axios.get(`http://localhost:5000/viewcategory`)
+            .then(res => {
+                if (res.data.success === true) {
+                    setCatlist(res.data.data);
+                    setOpencat(!opencat)
+                }
+            })
     }
 
     return (<div>
@@ -176,11 +215,11 @@ export default function MiniDrawer(props) {
                             <ListItemIcon>< ListAltIcon /></ListItemIcon>
                             <ListItemText primary='View Orders' />
                         </ListItem>
-                        <ListItem button key='View Categories'>
+                        <ListItem button onClick={viewtype} key='View Categories'>
                             <ListItemIcon><KitchenIcon /></ListItemIcon>
                             <ListItemText primary='View Categories' />
                         </ListItem>
-                        <ListItem button key='View Food Details'>
+                        <ListItem button onClick={viewfoodsadmin} key='View Food Details'>
                             <ListItemIcon><FastfoodIcon /></ListItemIcon>
                             <ListItemText primary='View Food Details' />
                         </ListItem>
@@ -198,8 +237,22 @@ export default function MiniDrawer(props) {
                 <div>
                     {opentype ? <Foodtype foodtype={true} open={true} /> : <></>}
                 </div>
-                <div>{openfoods ? <Foodtype foodtype={false} open={true} /> : <></>}
+                <div>{openfoods ? <Foodtype cats={catlist} foodtype={false} open={true} /> : <></>}
                 </div>
+                <div>{opencat ?
+                    <table id="customers">
+                        <caption>Food Categories</caption>
+                        <tr>
+                            <th>ID</th>
+                            <th>Food Type</th>
+                        </tr>
+                        {catlist.map(data => (<tr>
+                            <td>{data.id}</td>
+                            <td>{data.type}</td>
+                        </tr>))
+                        }
+                    </table> : <></>}</div>
+                <div>{openfood ? <FoodList user={false} data={foodlist} /> : <></>}</div>
             </div> : <div className={classes.root}>
                     <CssBaseline />
                     <AppBar

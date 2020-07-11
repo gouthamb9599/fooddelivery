@@ -22,16 +22,8 @@ export default function FormDialog(props) {
     const [foodtitle, setFoodtitle] = React.useState('');
     const [foodcomp, setFoodcomp] = React.useState('');
     const [foodcategory, setFoodcategory] = React.useState(0);
-    const [catlist, setCatlist] = React.useState([]);
     const [state, setState] = React.useState({ checkedA: true });
-    useEffect(() => {
-        Axios.get(`http://localhost:5000/viewcategory`)
-            .then(res => {
-                if (res.data.success === true) {
-                    setCatlist(res.data.data);
-                }
-            })
-    }, []);
+
     const handleChangehead = (event) => {
         setFoodcomp(event.target.value)
     }
@@ -123,7 +115,7 @@ export default function FormDialog(props) {
                                 onChange={handleChange}
                             >
 
-                                {catlist.map(data => (<MenuItem value={data.id}>{data.type}</MenuItem>))}
+                                {props.cats.map(data => (<MenuItem value={data.id}>{data.type}</MenuItem>))}
                             </Select>
 
                         </div>

@@ -102,6 +102,28 @@ const route = app => {
                 }
             })
     })
+    app.get('/viewfoodadmin', (req, res) => {
+        client.query(` select * from food`,
+            (err, results) => {
+                if (err) console.log(err)
+                else {
+                    if (results.rowCount !== 0) {
+                        res.send({ success: true, data: results.rows })
+                    }
+                }
+            })
+    })
+    app.get('/viewfooduser', (req, res) => {
+        client.query(` select * from food where availablity=$1`, [true],
+            (err, results) => {
+                if (err) console.log(err)
+                else {
+                    if (results.rowCount !== 0) {
+                        res.send({ success: true, data: results.rows })
+                    }
+                }
+            })
+    })
     app.post('/addfood', (req, res) => {
         const data = req.body;
         client.query(`insert into food(type,food,ingredients,availablity) values($1,$2,$3,$4)`, [data.type, data.food, data.ingredients, data.availability.checkedA],
