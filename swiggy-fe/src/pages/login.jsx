@@ -54,9 +54,9 @@ export class Login extends Component {
 
     render() {
         const responseGoogle = (response) => {
-            console.log(response);
+            // console.log(response);
             var res = response;
-            console.log(res);
+            // console.log(res);
             this.signup(res);
         }
         return (

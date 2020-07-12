@@ -137,5 +137,63 @@ const route = app => {
                 }
             })
     })
+    app.post('/changeav', (req, res) => {
+        const data = req.body;
+        client.query(`update food set availablity=$1 where id=$2  RETURNING availablity`, [!(data.av), data.user],
+            (err, results) => {
+                if (err) console.log(err)
+                else {
+                    console.log(results);
+                    if (results.rowCount !== 0) {
+                        console.log(results.rows[0].availability);
+                        res.send({ success: true, data: results.rows[0].availability })
+                    }
+                }
+            })
+    })
+    app.post('/addorder', (req, res) => {
+        client.query(`insert into orders(food_id,user_id) values($1,$2) RETURNING id`, [req.body.food, req.body.user],
+            (err, results) => {
+                if (err) console.log('12', err)
+                else {
+                    if (results.rowCount !== 0) {
+                        res.send({ success: true, data: results.rows[0].id })
+                    }
+                }
+            })
+    })
+    app.get('/getorders', (req, res) => {
+        client.query(`select * from orders`,
+            (err, results) => {
+                if (err) console.log(err)
+                else {
+                    if (results.rowCount !== 0) {
+                        res.send({ success: true, data: results.rows })
+                    }
+                }
+            })
+    })
+    app.get('/getstatus', (req, res) => {
+        client.query(`select * from delivery`,
+            (err, results) => {
+                if (err) console.log(err)
+                else {
+                    if (results.rowCount !== 0) {
+                        res.send({ success: true, data: results.rows })
+                    }
+                }
+            })
+    })
+    app.post(`/setstatus`, (req, res) => {
+        client.query(`update orders set status=$1 where id=$2`, [req.body.status, req.body.order],
+            (err, results) => {
+                if (err) console.log(err)
+                else {
+                    if (results.rowCount !== 0) {
+                        res.send({ success: true })
+                    }
+                }
+            })
+    })
 }
 module.exports = route;
