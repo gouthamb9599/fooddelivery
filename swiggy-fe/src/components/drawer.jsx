@@ -146,6 +146,7 @@ export default function MiniDrawer(props) {
     const [openorderdata, setOpenorderdata] = React.useState(false);
     const [openorderadmin, setOpenorderadmin] = React.useState(false);
     const [status, setStatus] = React.useState(0);
+    const [name, setName] = React.useState('');
     const [statusdata, setStatusdata] = React.useState([]);
     const handleChange = (event) => {
         setStatus(event.target.value);
@@ -165,7 +166,17 @@ export default function MiniDrawer(props) {
         setOpencartdata(!opencartdata)
     }
     const handleDrawerOpen = () => {
+        if (sessionStorage.getItem('userData')) {
+            const user = JSON.parse(sessionStorage.getItem('userData'))
+            setName(user.name)
+        }
         setOpen(true);
+        Axios.get(`http://localhost:5000/viewcategory`)
+            .then(res => {
+                if (res.data.success === true) {
+                    setCatlist(res.data.data);
+                }
+            })
         Axios.get(`http://localhost:5000/getstatus`)
             .then(res => {
                 if (res.data.success === true) {
@@ -191,18 +202,29 @@ export default function MiniDrawer(props) {
         setOpenfoods(!openfoods);
     }
     const openorders = () => {
-        Axios.get(`http://localhost:5000/getorders`)
-            .then(res => {
-                if (res.data.success === true) {
-                    setorderarray(res.data.data)
-                    if (sessionStorage.getItem('userData') !== null) {
+        console.log('heelo')
+        if (sessionStorage.getItem('userData') !== null) {
+            const user = JSON.parse(sessionStorage.getItem('userData'))
+            console.log(user.id);
+            Axios.get(`http://localhost:5000/getordersuser?id=${user.id}`)
+                .then(res => {
+                    if (res.data.success === true) {
+                        setorderarray(res.data.data)
                         setOpenorderdata(!openorderdata);
+
+
                     }
-                    else {
+                })
+        }
+        else if (sessionStorage.getItem('adminData') !== null) {
+            Axios.get(`http://localhost:5000/getorders`)
+                .then(res => {
+                    if (res.data.success === true) {
+                        setorderarray(res.data.data)
                         setOpenorderadmin(!openorderadmin)
                     }
-                }
-            })
+                })
+        }
     }
     const viewfoodsadmin = () => {
         if (sessionStorage.getItem('userData') !== null) {
@@ -408,7 +430,7 @@ export default function MiniDrawer(props) {
                         style={{ backgroundColor: '#e3714d' }}
                     >
                         <div className={classes.toolbar}>
-                            <AccountBoxIcon />{user.name}
+                            <AccountBoxIcon />{name}
                             <IconButton onClick={handleDrawerClose}>
                                 {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
                             </IconButton>

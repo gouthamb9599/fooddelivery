@@ -28,7 +28,7 @@ const route = app => {
                                     let token = jwt.sign({ data: google, exp: Math.floor(Date.now() / 100) + 600 * 600 },
                                         "secret"
                                     );
-                                    // console.log(token)
+                                    console.log(google.Name, results.rows[0].id)
                                     res.send({ success: true, token, Name: google.Name, id: results.rows[0].id, data: results.rows[0] });
                                 }
 
@@ -168,6 +168,21 @@ const route = app => {
                 if (err) console.log(err)
                 else {
                     if (results.rowCount !== 0) {
+                        res.send({ success: true, data: results.rows })
+                    }
+                }
+            })
+    })
+    app.get('/getordersuser', (req, res) => {
+        const id = req.query.id
+        console.log(id);
+        client.query(`select * from orders where user_id=$1`, [id],
+            (err, results) => {
+                if (err) console.log(err)
+                else {
+                    console.log(results)
+                    if (results.rowCount !== 0) {
+                        console.log('dataobtained')
                         res.send({ success: true, data: results.rows })
                     }
                 }
